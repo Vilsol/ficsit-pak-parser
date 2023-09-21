@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -30,8 +31,22 @@ public static class Program
             options.TimestampFormat = "HH:mm:ss ";
         });
 
-        builder.Services.AddGrpc();
+        builder.Services.AddGrpc(options =>
+        {
+            options.EnableDetailedErrors = true;
+            options.MaxReceiveMessageSize = 1024 * 1024 * 1024; // 1 GB
+            options.MaxSendMessageSize = 1024 * 1024 * 1024; // 1 GB
+        });
         builder.Services.AddGrpcReflection();
+
+        builder.WebHost.ConfigureKestrel(serverOptions =>
+        {
+            serverOptions.Limits.MaxRequestBodySize = int.MaxValue;
+            serverOptions.ConfigureEndpointDefaults(listenOptions =>
+            {
+                listenOptions.Protocols = HttpProtocols.Http2;
+            });
+        });
 
         var app = builder.Build();
 
@@ -42,6 +57,5 @@ public static class Program
         app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
         app.Run();
-
     }
 }

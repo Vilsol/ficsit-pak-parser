@@ -24,4 +24,4 @@ COPY FactoryGame.usmap .
 EXPOSE 80
 
 ENTRYPOINT ["./FicsitPakParser"]
-CMD ["FactoryGame.usmap"]
+CMD ["FactoryGame.usmap", "--urls", "http://0.0.0.0:50051"]
