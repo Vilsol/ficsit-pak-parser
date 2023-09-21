@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+service Parser {
+  rpc Parse (ParseRequest) returns (stream AssetResponse);
+}
+
+message ParseRequest {
+  bytes zip_data = 1;
+}
+
+message AssetResponse {
+  string path = 1;
+  bytes data = 2;
+}
