@@ -6,6 +6,7 @@ service Parser {
 
 message ParseRequest {
   bytes zip_data = 1;
+  string engine_version = 2;
 }
 
 message AssetResponse {

@@ -34,6 +34,26 @@ public class ParserService : Parser.ParserBase
 
     public override async Task Parse(ParseRequest request, IServerStreamWriter<AssetResponse> responseStream, ServerCallContext context)
     {
+        EGame engineVersion;
+        switch (request.EngineVersion)
+        {
+            case "4.26":
+                engineVersion = EGame.GAME_UE4_26;
+                break;
+            case "5.1":
+                engineVersion = EGame.GAME_UE5_1;
+                break;
+            case "5.2":
+                engineVersion = EGame.GAME_UE5_2;
+                break;
+            case "5.3":
+                engineVersion = EGame.GAME_UE5_3;
+                break;
+            default:
+                _logger.LogInformation("Unknown engine version: {version}", request.EngineVersion);
+                return;
+        }
+
         _logger.LogInformation("Parsing zip {size}", request.ZipData.Length);
 
         // Create temporary directory
@@ -49,7 +69,7 @@ public class ParserService : Parser.ParserBase
             zip.ExtractToDirectory(tempDirectory);
 
             // Create asset provider
-            var provider = new DefaultFileProvider(tempDirectory, SearchOption.AllDirectories, true, new VersionContainer(EGame.GAME_UE5_1));
+            var provider = new DefaultFileProvider(tempDirectory, SearchOption.AllDirectories, true, new VersionContainer(engineVersion));
 
             Debug.Assert(Program.usmap != null, "Program.usmap != null");
             provider.MappingsContainer = new FileUsmapTypeMappingsProvider(Program.usmap);
