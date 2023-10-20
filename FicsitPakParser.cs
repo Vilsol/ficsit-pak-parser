@@ -42,7 +42,7 @@ public static class Program
         builder.WebHost.ConfigureKestrel(serverOptions =>
         {
             serverOptions.Limits.MaxRequestBodySize = int.MaxValue;
-            serverOptions.ConfigureEndpointDefaults(listenOptions =>
+            serverOptions.ListenAnyIP(50051, listenOptions =>
             {
                 listenOptions.Protocols = HttpProtocols.Http2;
             });
